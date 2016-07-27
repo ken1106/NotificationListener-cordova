@@ -10,6 +10,7 @@ import android.util.Log;
 import org.apache.cordova.PluginResult;
 import android.service.notification.StatusBarNotification;
 import android.os.Bundle;
+import android.app.Notification;
 
 public class NotificationCommands extends CordovaPlugin {
 
@@ -55,7 +56,7 @@ public class NotificationCommands extends CordovaPlugin {
       callbackContext.sendPluginResult(result);
     }
 
-    public static void notifyListener(StatusBarNotification n){
+    public static void notifyListener(boolean isPosted, StatusBarNotification n){
       if (listener == null) {
         Log.e(TAG, "Must define listener first. Call notificationListener.listen(success,error) first");
         return;
@@ -63,7 +64,8 @@ public class NotificationCommands extends CordovaPlugin {
       try  {
 
         JSONObject json = parse(n);
-
+        json.put("isPosted", isPosted);
+        
         PluginResult result = new PluginResult(PluginResult.Status.OK, json);
 
         Log.i(TAG, "Sending notification to listener " + json.toString());
@@ -81,13 +83,17 @@ public class NotificationCommands extends CordovaPlugin {
 
         JSONObject json = new JSONObject();
 
+        Notification notification = n.getNotification();
         Bundle extras = n.getNotification().extras;
 
         json.put("title", getExtra(extras, "android.title"));
         json.put("package", n.getPackageName());
+        json.put("category", notification.category);
         json.put("text", getExtra(extras,"android.text"));
         json.put("textLines", getExtraLines(extras, "android.textLines"));
-
+        Log.i(TAG, "StatusBarNotification n: " + n.toString());
+        Log.i(TAG, "getNotification : " + n.getNotification().toString());
+        Log.i(TAG, "extras : " + extras.toString());
         return json;
     }
 

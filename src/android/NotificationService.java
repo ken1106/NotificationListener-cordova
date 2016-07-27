@@ -50,7 +50,7 @@ public class NotificationService extends NotificationListenerService {
 
         if (pk.equals("android") ||  ignorePkg(pk) || sbn.isOngoing()) Log.d(TAG, "Ignore notification from pkg " + pk);
         else {
-            NotificationCommands.notifyListener(sbn);
+            NotificationCommands.notifyListener(true, sbn);
             addNotification(sbn);
         }
     }
@@ -62,10 +62,14 @@ public class NotificationService extends NotificationListenerService {
     @Override
     public void onNotificationRemoved(StatusBarNotification sbn) {
         //debugNotification(sbn);
+        NotificationCommands.notifyListener(false, sbn);
+        remove(sbn);
+        Log.i(TAG, "onNotificationRemoved:" + sbn.toString());
     }
 
     private void addNotification(StatusBarNotification msg){
         notifications.add(msg);
+        Log.i(TAG, "addNotification:" + msg.toString());
     }
 
     public static void removeAll(){
